@@ -4,19 +4,19 @@ video_cmd="mpv"
 
 if [ -e .play ]
 then
-	file_to_watch=`cat .play`
+	file_to_watch=$(cat .play)
 	file_found=false
 	for f in *
 	do
 		if [[ $file_found = "true" ]]
 		then
-			echo $f > .play
+			echo "$f" > .play
 			exit 0
 		fi
 
-		if [[ $f = $file_to_watch ]]
+		if [[ $f = "$file_to_watch" ]]
 		then
-			$video_cmd $file_to_watch
+			$video_cmd "$file_to_watch"
 			file_found=true
 		fi
 	done
@@ -30,10 +30,10 @@ else
 	do
 		if [[ $file_found = "false" ]]
 		then
-			$video_cmd $f
+			$video_cmd "$f"
 			file_found=true
 		else
-			echo $f > .play
+			echo "$f" > .play
 			exit 0
 		fi
 	done
