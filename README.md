@@ -1,4 +1,4 @@
-# Dotfiles & scripts
+# Scripts
 
 Some scripts I wrote.
 
