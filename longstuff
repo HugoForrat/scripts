@@ -1,0 +1,3 @@
+#!/bin/bash
+
+"$@" && notify-send 'Long stuff: ' "The $1 operation is over" --icon=dialog-information || notify-send 'Long stuff: ' "The $1 operation has failed" --icon=dialog-information
