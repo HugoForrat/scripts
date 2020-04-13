@@ -35,21 +35,25 @@ def main():
     found_a_file = False
 
     # Downloading loop
-    for url in sys.argv[1:]:
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        for line in soup.find_all(attrs={"class":"fileText"}):
-            str_line = str(line)
-            result = FILETEXT_REGEX.search(str_line)
-            if result is not None:
-                width = int(result.group('width'))
-                height = int(result.group('height'))
-                if height > width:
-                    continue
-                file_url = 'https:'+result.group('UID')
-                filename = FILENAME_REGEX.search(result.group('UID')).group(1)
-                download_file(file_url, tmp_dir.name+'/'+filename)
-                found_a_file = True
+    for index, url in enumerate(sys.argv[1:]):
+        try:
+            soup = BeautifulSoup(requests.get(url).text, 'html.parser')
+            for line in soup.find_all(attrs={"class":"fileText"}):
+                result = FILETEXT_REGEX.search(str(line))
+                if result is not None:
+                    width = int(result.group('width'))
+                    height = int(result.group('height'))
+                    if height > width:
+                        continue
+                    file_url = 'https:'+result.group('UID')
+                    filename = FILENAME_REGEX.search(result.group('UID')).group(1)
+                    download_file(file_url, tmp_dir.name+'/'+filename)
+                    found_a_file = True
+        except requests.exceptions.SSLError:
+            print("Couldn't process:")
+            for remaining_args in sys.argv[index:]:
+                print(remaining_args)
+            break
     # end DL loop
 
     if not found_a_file:
@@ -58,8 +62,7 @@ def main():
     # Selection Loop
     cmd = subprocess.run(['/usr/bin/sxiv', '-o', tmp_dir.name],
                          capture_output=True, text=True, check=True)
-    files_to_keep = cmd.stdout.strip().split('\n')
-    for f in files_to_keep:
+    for f in cmd.stdout.strip().split('\n'):
         shutil.copy(f, '/home/hugo/WP')
 
     tmp_dir.cleanup() # Deletes the dir and erases the files inside of it
