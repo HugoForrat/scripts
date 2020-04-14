@@ -60,10 +60,11 @@ def main():
         sys.exit()
 
     # Selection Loop
-    cmd = subprocess.run(['/usr/bin/sxiv', '-o', tmp_dir.name],
+    cmd = subprocess.run(['/usr/bin/sxiv', '-N', 'Wallpaper scraper', '-o', tmp_dir.name],
                          capture_output=True, text=True, check=True)
-    for current_file in cmd.stdout.strip().split('\n'):
-        shutil.copy(current_file, '/home/hugo/WP')
+    if len(cmd.stdout) > 0:
+        for current_file in cmd.stdout.strip().split('\n'):
+            shutil.copy(current_file, '/home/hugo/WP')
 
     tmp_dir.cleanup() # Deletes the dir and erases the files inside of it
     # END OF MAIN()
