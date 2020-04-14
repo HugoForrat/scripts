@@ -16,12 +16,12 @@ FILENAME_REGEX = re.compile(r"//i\.4cdn\.org/wg/(?P<id>.*)$")
 
 # adapted from https://stackoverflow.com/a/16696317
 def download_file(url, filepath):
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-    with open(filepath, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=8192):
-            if chunk: # filter out keep-alive new chunks
-                f.write(chunk)
+    with requests.get(url, stream=True) as result:
+        result.raise_for_status()
+        with open(filepath, 'wb') as current_file:
+            for chunk in result.iter_content(chunk_size=8192):
+                if chunk: # filter out keep-alive new chunks
+                    current_file.write(chunk)
 
 def main():
     # Checking the correctness of the arguments
@@ -62,8 +62,8 @@ def main():
     # Selection Loop
     cmd = subprocess.run(['/usr/bin/sxiv', '-o', tmp_dir.name],
                          capture_output=True, text=True, check=True)
-    for f in cmd.stdout.strip().split('\n'):
-        shutil.copy(f, '/home/hugo/WP')
+    for current_file in cmd.stdout.strip().split('\n'):
+        shutil.copy(current_file, '/home/hugo/WP')
 
     tmp_dir.cleanup() # Deletes the dir and erases the files inside of it
     # END OF MAIN()
