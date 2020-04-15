@@ -5,7 +5,7 @@
 TIME_LIMIT=3
 
 START_TIME=$SECONDS
-"$@" 
+$@
 res=$?
 ELAPSED_TIME=$((SECONDS - START_TIME))
 
