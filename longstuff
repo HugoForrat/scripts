@@ -1,3 +1,21 @@
 #!/bin/bash
 
-"$@" && notify-send 'Long stuff: ' "The $1 operation is over" --icon=dialog-information || notify-send 'Long stuff: ' "The $1 operation has failed" --icon=dialog-information
+# This variable contains the number of seconds after which
+# A notification should be sent
+TIME_LIMIT=3
+
+START_TIME=$SECONDS
+"$@" 
+res=$?
+ELAPSED_TIME=$((SECONDS - START_TIME))
+
+if [[ $ELAPSED_TIME -ge $TIME_LIMIT ]]
+then
+	if [[ $res = 0 ]]
+	then
+		notify-send 'Long stuff: ' "The $1 operation is over" --icon=dialog-information
+	else
+		notify-send 'Long stuff: ' "The $1 operation has failed" --icon=dialog-information
+	fi
+fi
+
