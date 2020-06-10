@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+# FIXME : better tmpfile
+
+ls /home/hugo/WP | grep -v "$(cat .local/wallpaper)" | shuf | sed 1q  > tmpfile && mv tmpfile /home/hugo/.local/wallpaper 
+
+/usr/bin/feh --no-fehbg --bg-scale /home/hugo/WP/"$(cat .local/wallpaper)"
