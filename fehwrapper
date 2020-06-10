@@ -2,6 +2,9 @@
 
 # FIXME : better tmpfile
 
-ls /home/hugo/WP | grep -v "$(cat .local/wallpaper)" | shuf | sed 1q  > tmpfile && mv tmpfile /home/hugo/.local/wallpaper 
+WPDIR="${WPDIR:-/home/$USER/.wallpapers}" # OK !
+CURRENTWP="${CURRENTWP:-/home/$USER/.local/wallpaper}" # OK !
 
-/usr/bin/feh --no-fehbg --bg-scale /home/hugo/WP/"$(cat .local/wallpaper)"
+ls $WPDIR | grep -v "$(cat $CURRENTWP)" | shuf | sed 1q  > tmpfile && mv tmpfile $CURRENTWP
+
+/usr/bin/feh --no-fehbg --bg-scale $WPDIR/"$(cat .local/wallpaper)"
