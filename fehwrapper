@@ -1,9 +1,14 @@
 #!/usr/bin/bash
 
 # FIXME : better tmpfile
+# Needs the name of the file in $CURRENTWP to work
+# TODO add tests for the situation with no $CURRENTWP or an empty file
 
 WPDIR="${WPDIR:-/home/$USER/.wallpapers}" # OK !
 CURRENTWP="${CURRENTWP:-/home/$USER/.local/wallpaper}" # OK !
+
+echo $WPDIR
+echo $CURRENTWP
 
 ls $WPDIR | grep -v "$(cat $CURRENTWP)" | shuf | sed 1q  > tmpfile && mv tmpfile $CURRENTWP
 
