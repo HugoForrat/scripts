@@ -8,10 +8,11 @@ Some scripts I wrote.
  
 A quick and *dirty* way to convert a python file to a file that can be read by [PlantUML](http://plantuml.com).
 This only parse methods and attribute and doesn't try to search for inheritance etc...
-- [podcast_rename](/podcast_rename)
+- [A podcast renaming script](/podcast)
  
-A script to rename podcast according to their meta data in batch.
-Needs [`exiftool`](https://sno.phy.queensu.ca/~phil/exiftool/), [`unf`](https://github.com/io12/unf) and [`fzf`](https://github.com/junegunn/fzf#fuzzy-completion-for-bash-and-zsh) to work. 
+A script to download podcasts from the Podcast Addict Android application, and to give, to the best of its ability, sensible and UNIX-compatible filenames.
+Needs [`exiftool`](https://sno.phy.queensu.ca/~phil/exiftool/), [`unf`](https://github.com/io12/unf), [`simple-mtpfs`](https://github.com/phatina/simple-mtpfs), as well as `(neo)vim` to work. 
+Be careful if you wish to use yourself: some file/directory path are hardcoded and you'll probably want to change them.
 
 - [play.sh](/play.sh)
 

@@ -2,7 +2,6 @@
 
 shopt -s globstar
 
-# mk mount tmp dir
 mountdir=$(mktemp -d)
 workingdir=$(mktemp -d)
 finaldir="$HOME/HDD/Podcast"
@@ -17,10 +16,6 @@ then
 fi
 
 simple-mtpfs "$mountdir"
-
-# cd "$mountdir"/Android/data/com.bambuna.podcastaddict/files/podcast \
-#   || echo "Error; podcast directory not found" # TODO exit here
-# ls ./**/*.mp3
 
 cp "$mountdir"/Android/data/com.bambuna.podcastaddict/files/podcast/**/*.mp3 "$workingdir"/.
 
@@ -49,16 +44,6 @@ mv "$workingdir"/* "$finaldir"/.
 rmdir "$workingdir"
 rm "$titlefile"
 
-###
-# grep ^.*\.mp3 Title$ out_vimmed | awk '{print $1}'
-# grep ^.*\.mp3 Album$ out_vimmed | awk '{print $1}'
-# new_name=$(exiftool -v '-filename<${Album;}' 10467-06_05_2019-ITEMA_22054175-2_3042.mp3 | sed -e '/-->/!d' -e "s/^.* --> '\(.*\)'$/\1/")
-# unf -f "$new_name"
-###
-
 # Unmount
 fusermount -u "$mountdir"
 rmdir "$mountdir"
-
-# exit
-# cd "$originaldir" || exit
