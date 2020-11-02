@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import re
 import shutil
 import tempfile
@@ -12,7 +13,7 @@ from bs4 import BeautifulSoup
 
 URL_REGEX = re.compile(r"^https://boards\.4chan\.org/wg/thread/\d+$")
 FILETEXT_REGEX = re.compile(r"^<div class=\"fileText\" id=\".*\">File: <a href=\"(?P<UID>.*)\" target=\".*\">.*</a> \(.*, (?P<width>\d+)x(?P<height>\d+)\)</div>$")
-FILENAME_REGEX = re.compile(r"//i\.4cdn\.org/wg/(?P<id>.*)$")
+FILENAME_REGEX = re.compile(r"//i(s2\.4chan|\.4cdn)\.org/wg/(?P<id>.*)$")
 
 # adapted from https://stackoverflow.com/a/16696317
 def download_file(url, filepath):
@@ -45,8 +46,9 @@ def main():
                     height = int(result.group('height'))
                     if height > width:
                         continue
-                    file_url = 'https:'+result.group('UID')
-                    filename = FILENAME_REGEX.search(result.group('UID')).group(1)
+                    uid = result.group('UID')
+                    file_url = 'https:'+uid
+                    filename = FILENAME_REGEX.search(uid).group('id')
                     download_file(file_url, tmp_dir.name+'/'+filename)
                     found_a_file = True
         except requests.exceptions.SSLError:
@@ -64,7 +66,7 @@ def main():
                          capture_output=True, text=True, check=True)
     if len(cmd.stdout) > 0:
         for current_file in cmd.stdout.strip().split('\n'):
-            shutil.copy(current_file, '/home/hugo/WP')
+            shutil.copy(current_file, os.path.expandvars('$HOME/.wallpapers/'))
 
     tmp_dir.cleanup() # Deletes the dir and erases the files inside of it
     # END OF MAIN()
