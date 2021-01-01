@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if pgrep spotify > /dev/null; then
+	i3-msg -q scratchpad show
+	i3-msg -q move position center
+else
+	spotify 2> /dev/null &
+	i3-msg -q scratchpad show
+	disown 
+fi

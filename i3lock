@@ -1,0 +1,3 @@
+#!/usr/bin/sh
+
+/usr/bin/i3lock --tiling --image=$(ls ~/.wallpapers/*.png | shuf | head -n 1)

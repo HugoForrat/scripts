@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/Pictures/Screenshot/
+while true; do
+  ls -d ./*.png | entr -d ln -sf $(realpath $(fd . | tail -n 1)) $HOME/last_sc.png
+done
