@@ -3,9 +3,6 @@
 # TODO 
 # Check if db is locked or not ?
 
-# TODO
-# Handle existing bookmark files
-
 # TODO 
 # choice for the destination folder
 
@@ -26,7 +23,8 @@ mkdir -p "$dst_dir"
 for folder_id in $(sqlite3 "$ff_db" 'select parent from moz_bookmarks where type=1' | sort -u);
 do
   name=$(sqlite3 "$ff_db" "select title from moz_bookmarks where id=$folder_id")
-  sqlite3 "$ff_db" \
+  [ -f "$dst_dir"/"$name" ] && rm "$dst_dir"/"$name"
+  sqlite3 -separator ' | ' "$ff_db" \
     "select moz_bookmarks.title, url \
     from moz_bookmarks, moz_places \
     where moz_bookmarks.type=1 and moz_bookmarks.parent=$folder_id and moz_bookmarks.fk = moz_places.id" \
