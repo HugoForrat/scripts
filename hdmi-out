@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for ws in $(i3-msg -t 'get_workspaces' | jq '.[] | select(.output == "HDMI-0") | .name')
+do
+  i3-msg "[workspace=$ws]" move workspace to output eDP-1-1
+done
+
+xrandr --output eDP-1-1 --primary --mode 1920x1080 --rotate normal \
+  --output HDMI-0 --same-as eDP-1-1 && 
+
+i3-msg 'restart'
