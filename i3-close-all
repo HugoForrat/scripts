@@ -1,0 +1,9 @@
+#!/bin/bash
+
+win_name=$(xdotool getactivewindow getwindowclassname)
+
+# i3-msg -t get_tree | jq 'recurse(.nodes[])| select(.window_properties.class == "Zathura") | .id '
+
+if [[ $(printf 'Yes\nNo' | rofi -dmenu -p "Do you want to close all $win_name windows?" -i) = 'Yes' ]]; then 
+  i3-msg "[class=$win_name] kill"
+fi
