@@ -6,6 +6,7 @@ import re
 extract_num = re.compile(r"\D+(?P<first_num>\d+)(?P<rest>.*$)")
 
 def is_lt(s1, s2):
+    # TODO: handle unequal number of numerical values in windows name
     res1 = extract_num.search(s1)
     res2 = extract_num.search(s2)
     if res1 is None or res2 is None:
@@ -17,6 +18,8 @@ def is_lt(s1, s2):
     else:
         return n1 < n2
 
+# https://en.wikipedia.org/wiki/Selection_sort
+# `One thing which distinguishes selection sort from other sorting algorithms is that it makes the minimum possible number of swaps`
 def selection_sort(a):
     length = len(a)
     for i in range(length):
@@ -45,6 +48,7 @@ class Window:
         subprocess.run(i3swap_cmd)
 # End class Window
 
+# TODO: handle several stacked containers
 i3get_tree_cmd = ['i3-msg', '-t', 'get_tree']
 jq_cmd = ['jq', 'recurse(.nodes[]) | select(.layout == "stacked") | recurse(.nodes[]) | select(.name != null) | .id, .name']
 
