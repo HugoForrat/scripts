@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+import subprocess
+import re
+
+extract_num = re.compile(r"\D+(?P<first_num>\d+)(?P<rest>.*$)")
+
+def is_lt(s1, s2):
+    res1 = extract_num.search(s1)
+    res2 = extract_num.search(s2)
+    if res1 is None or res2 is None:
+        raise ValueError("Missing number")
+    n1 = int(res1.group('first_num'))
+    n2 = int(res2.group('first_num'))
+    if n1 == n2:
+        return is_lt(res1.group('rest'), res2.group('rest'))
+    else:
+        return n1 < n2
+
+def selection_sort(a):
+    length = len(a)
+    for i in range(length):
+        # Find Minimum
+        jMin = i
+        for j in range(i+1, length):
+            if a[j] < a[jMin]:
+                jMin = j
+
+        # Perform swap
+        if jMin != i:
+            a[i].swap(a[jMin])
+            a[i], a[jMin] = a[jMin], a[i]
+
+
+class Window:
+    def __init__(self, name, ID):
+        self._name = name
+        self._id = ID
+
+    def __lt__(self, other):
+        return is_lt(self._name, other._name)
+
+    def swap(self, other):
+        i3swap_cmd = ['i3-msg', f'[con_id={self._id}] swap with con_id {other._id}']
+        subprocess.run(i3swap_cmd)
+# End class Window
+
+i3get_tree_cmd = ['i3-msg', '-t', 'get_tree']
+jq_cmd = ['jq', 'recurse(.nodes[]) | select(.layout == "stacked") | recurse(.nodes[]) | select(.name != null) | .id, .name']
+
+try:
+    i3_ps = subprocess.Popen(i3get_tree_cmd, stdout=subprocess.PIPE, text=True)
+    output = subprocess.check_output(jq_cmd, stdin=i3_ps.stdout, text=True)
+    i3_ps.wait()
+except subprocess.CalledProcessError as err:
+    print(err)
+
+win_vec = []
+
+for i in range(0, len(output.splitlines()), 2):
+    win_vec.append(Window(output.splitlines()[i+1], output.splitlines()[i]))
+
+selection_sort(win_vec)
