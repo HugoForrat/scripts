@@ -3,7 +3,21 @@
 import subprocess
 import re
 
+# TODO: handle number at beginning of filename ?
 extract_num = re.compile(r"\D+(?P<first_num>\d+)(?P<rest>.*$)")
+
+class Window:
+    def __init__(self, name, ID):
+        self._name = name
+        self._id = ID
+
+    def __lt__(self, other):
+        return is_lt(self._name, other._name)
+
+    def swap(self, other):
+        i3swap_cmd = ['i3-msg', f'[con_id={self._id}] swap with con_id {other._id}']
+        subprocess.run(i3swap_cmd)
+# End class Window
 
 def is_lt(s1, s2):
     # TODO: handle unequal number of numerical values in windows name
@@ -34,34 +48,41 @@ def selection_sort(a):
             a[i].swap(a[jMin])
             a[i], a[jMin] = a[jMin], a[i]
 
+def focused_x_id():
+    xdotool_cmd = ['xdotool', 'getactivewindow']
+    x_id = subprocess.run(xdotool_cmd, capture_output=True, text=True)
+    return x_id.stdout.strip()
 
-class Window:
-    def __init__(self, name, ID):
-        self._name = name
-        self._id = ID
+def parent_i3_id(focused_x_id):
+    i3get_tree_cmd = ['i3-msg', '-t', 'get_tree']
+    jq_parent_cmd = ['jq', f'recurse(.nodes[]) | select(.nodes[].window == {focused_x_id}) | .id']
+    try:
+        i3_ps = subprocess.Popen(i3get_tree_cmd, stdout=subprocess.PIPE, text=True)
+        output = subprocess.check_output(jq_parent_cmd, stdin=i3_ps.stdout, text=True)
+        i3_ps.wait()
+    except subprocess.CalledProcessError as err:
+        print(err)
+    return output.strip()
 
-    def __lt__(self, other):
-        return is_lt(self._name, other._name)
+def siblings_i3_id(parent_id):
+    i3get_tree_cmd = ['i3-msg', '-t', 'get_tree']
+    # This request also return the parent's id but it's easier to remove it afterward than to tweak the jq request
+    jq_siblings_cmd = ['jq', f'recurse(.nodes[]) | select(.id == {parent_id}) | recurse(.nodes[]) | .id, .name']
+    try:
+        i3_ps = subprocess.Popen(i3get_tree_cmd, stdout=subprocess.PIPE, text=True)
+        output = subprocess.check_output(jq_siblings_cmd, stdin=i3_ps.stdout, text=True)
+        i3_ps.wait()
+    except subprocess.CalledProcessError as err:
+        print(err)
+    lines = output.splitlines()
+    win_vec = []
+    for i in range(0, len(lines), 2):
+        if lines[i] == parent_id:
+            continue
+        win_vec.append(Window(lines[i+1], lines[i]))
+    return win_vec
 
-    def swap(self, other):
-        i3swap_cmd = ['i3-msg', f'[con_id={self._id}] swap with con_id {other._id}']
-        subprocess.run(i3swap_cmd)
-# End class Window
 
-# TODO: handle several stacked containers
-i3get_tree_cmd = ['i3-msg', '-t', 'get_tree']
-jq_cmd = ['jq', 'recurse(.nodes[]) | select(.layout == "stacked") | recurse(.nodes[]) | select(.name != null) | .id, .name']
+vec = siblings_i3_id(parent_i3_id(focused_x_id()))
 
-try:
-    i3_ps = subprocess.Popen(i3get_tree_cmd, stdout=subprocess.PIPE, text=True)
-    output = subprocess.check_output(jq_cmd, stdin=i3_ps.stdout, text=True)
-    i3_ps.wait()
-except subprocess.CalledProcessError as err:
-    print(err)
-
-win_vec = []
-
-for i in range(0, len(output.splitlines()), 2):
-    win_vec.append(Window(output.splitlines()[i+1], output.splitlines()[i]))
-
-selection_sort(win_vec)
+selection_sort(vec)
